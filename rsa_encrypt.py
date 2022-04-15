@@ -2,8 +2,8 @@ import argparse, random
 from pathlib import Path
 
 # GLOBALS
-MILLER_RABIN_LIMIT = 10
-BIT = 128
+MILLER_RABIN_LIMIT = 6
+BIT = 1024
 
 
 def n_bit_random(n):
