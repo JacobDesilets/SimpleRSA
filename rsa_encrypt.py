@@ -41,16 +41,33 @@ def calc_e(phi):
             return i
 
 
-def encrypt(plaintext, p, q):
-    ciphertext = ''
+def generate_keys():
+    keys = {}
+    p = random_prime()
+    q = random_prime()
     n = p * q
     phi = (p - 1) * (q - 1)
     e = calc_e(phi)
     d = pow(e, -1, phi)
+
+    keys['p'] = n
+    keys['q'] = q
+    keys['n'] = n
+    keys['phi'] = phi
+    keys['e'] = e
+    keys['d'] = d
+
+    return keys
+
+
+def encrypt(plaintext, keys):
+    ciphertext = ''
+    n = keys['n']
+    e = keys['e']
     for char in plaintext:
         m = ord(char)
         encrypted_char = pow(m, e, n)
-        ciphertext += str(encrypted_char)
+        ciphertext += f'{encrypted_char}\n'
     return ciphertext
 
 
@@ -67,3 +84,23 @@ if __name__ == '__main__':
     dest = Path(__file__).with_name(args.dest)
     pub_keys = Path(__file__).with_name(args.pub_keys)
     sec_keys = Path(__file__).with_name(args.sec_keys)
+
+    src_f = open(src)
+    plaintext = src_f.read()
+    src_f.close()
+
+    keys = generate_keys()
+
+    ciphertext = encrypt(plaintext, keys)
+    
+    dest_f = open(dest, 'w')
+    dest_f.write(ciphertext)
+    dest_f.close()
+
+    pub_keys_f = open(pub_keys, 'w')
+    pub_keys_f.write(f'{keys["n"]}\n{keys["e"]}')
+    pub_keys_f.close()
+
+    sec_keys_f = open(sec_keys, 'w')
+    sec_keys_f.write(f'{keys["p"]}\n{keys["q"]}\n{keys["phi"]}\n{keys["d"]}')
+    sec_keys_f.close()
